@@ -1,0 +1,20 @@
+### login
+GET http://127.0.0.1:8000/rest-auth/login/ HTTP/1.1
+Content-Type: application/json
+Authorization: Token a2d9b63d2bc4aa133d4ca0b42931d8107c189c15
+
+{
+    "email": "thien@gmail.com",
+    "password": "test8888"
+}
+
+
+###
+POST http://127.0.0.1:8000/assignments/ HTTP/1.1
+Content-Type: application/json
+Authorization: Token 5f73b1bc9d106581ab1d71dee3df812790f8ed3b
+
+{
+    "title": "Assignment 2",
+    "teacher": "teacher@gmail.com"
+}
