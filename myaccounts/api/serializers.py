@@ -34,8 +34,9 @@ class MyUserSerializer(serializers.ModelSerializer):
         user.set_password(password)   
         user.save()
         """have to put set_password and save otherwise can not login in rest-auth because it won't create password even though user created"""
-        profile_instance = Profile.objects.create(user=user,**profile_data)
-        
+        profile_data['user'] = user
+        profile_instance = Profile.objects.create(**profile_data)
+        # profile_instance = Profile.objects.create(user=user,**profile_data)
         return user
 
         # profile_data = validated_data.pop('profile')

@@ -9,7 +9,25 @@ class Assignment(models.Model):
     def __str__(self):
         return self.title
 
+class Question(models.Model):
+    question_title = models.CharField(max_length=200)
+    assignment = models.ForeignKey(
+        Assignment, on_delete=models.CASCADE, related_name='questions_of_assignment', blank=True, null=True)
+    order = models.SmallIntegerField()
 
+     # answer = models.ForeignKey(
+    #     Choice, on_delete=models.CASCADE, related_name='answer', blank=True, null=True)
+
+    def __str__(self):
+        return self.question_title
+
+class Choice(models.Model):
+    question = models.ManyToManyField(Question, related_name='choices_of_question')
+    choice_title = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.choice_title
+    
 class GradedAssignment(models.Model):
     student = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     assignment = models.ForeignKey(
@@ -17,32 +35,7 @@ class GradedAssignment(models.Model):
     grade = models.FloatField()
 
     def __str__(self):
-        return self.student.username
-
-
-class Choice(models.Model):
-    title = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.title
-
-
-class Question(models.Model):
-    question = models.CharField(max_length=200)
-    choices = models.ManyToManyField(Choice)
-    answer = models.ForeignKey(
-        Choice, on_delete=models.CASCADE, related_name='answer', blank=True, null=True)
-    assignment = models.ForeignKey(
-        Assignment, on_delete=models.CASCADE, related_name='questions', blank=True, null=True)
-    order = models.SmallIntegerField()
-
-    def __str__(self):
-        return self.question
-
-            
-    
-
-
+        return self.student.email
 # Assignment:
 #     - title
 #     - teacher(FK)

@@ -1,7 +1,6 @@
 ### login
-GET http://127.0.0.1:8000/rest-auth/login/ HTTP/1.1
+POST http://127.0.0.1:8000/rest-auth/login/ HTTP/1.1
 Content-Type: application/json
-Authorization: Token a2d9b63d2bc4aa133d4ca0b42931d8107c189c15
 
 {
     "email": "thien@gmail.com",
@@ -10,11 +9,38 @@ Authorization: Token a2d9b63d2bc4aa133d4ca0b42931d8107c189c15
 
 
 ###
-POST http://127.0.0.1:8000/assignments/ HTTP/1.1
+GET http://127.0.0.1:8000/assignments/ HTTP/1.1
 Content-Type: application/json
 Authorization: Token 5f73b1bc9d106581ab1d71dee3df812790f8ed3b
 
 {
     "title": "Assignment 2",
-    "teacher": "teacher@gmail.com"
+    "teacher": "teacher@gmail.com",
+    "questions": {
+        "q": "Question 1"
+    },
+    "choices": {
+        "c": "True",
+        "c": "False"
+    }
+}
+
+### register
+POST http://127.0.0.1:8000/myaccounts/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "thien8@gmail.com",
+    "first_name": "Th",
+    "last_name": "Ng",
+    "department": "Py",
+    "phone": "8877999",
+    "password": "test8888",
+    "password2": "test8888",
+    "profile": {
+        "student_id": "222"
+    },
+    "date_of_birth": "2000-05-05",
+    "is_teacher": true,
+    "is_student": false
 }
