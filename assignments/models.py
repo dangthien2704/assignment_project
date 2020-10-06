@@ -14,10 +14,7 @@ class Question(models.Model):
     assignment = models.ForeignKey(
         Assignment, on_delete=models.CASCADE, related_name='questions_of_assignment', blank=True, null=True)
     order = models.SmallIntegerField()
-
-     # answer = models.ForeignKey(
-    #     Choice, on_delete=models.CASCADE, related_name='answer', blank=True, null=True)
-
+    
     def __str__(self):
         return self.question_title
 
@@ -27,7 +24,16 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_title
+
+class Answer(models.Model):
+    question = models.OneToOneField(
+        Question, on_delete=models.CASCADE, related_name='answer_of_question', blank=True, null=True)
+    answer = models.ForeignKey(
+        Choice, on_delete=models.CASCADE, related_name='answer_of_question', blank=True, null=True)  
     
+    def __str__(self):
+        return self.answer.choice_title
+
 class GradedAssignment(models.Model):
     student = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     assignment = models.ForeignKey(
@@ -36,21 +42,4 @@ class GradedAssignment(models.Model):
 
     def __str__(self):
         return self.student.email
-# Assignment:
-#     - title
-#     - teacher(FK)
-
-# Gradedassignment:
-#     - assignment(FK)
-#     - student(FK)
-#     - Graded
-
-# Choice:
-#     - Choice CharField
-
-# Question:
-#     - question char
-#     - choice Many?
-#     - assignment PK
-#     - order 
         

@@ -9,21 +9,41 @@ Content-Type: application/json
 
 
 ###
-GET http://127.0.0.1:8000/assignments/ HTTP/1.1
+POST http://127.0.0.1:8000/assignments/ HTTP/1.1
 Content-Type: application/json
-Authorization: Token 5f73b1bc9d106581ab1d71dee3df812790f8ed3b
+Authorization: Token 558d643f57bf08e33f69b8af8936da1406c75df7
 
 {
-    "title": "Assignment 2",
-    "teacher": "teacher@gmail.com",
-    "questions": {
-        "q": "Question 1"
+  "questions_of_assignment": [
+    {
+        "question_title": "Is it cool?",
+        "choices_of_question": [
+            {"choice_title": "Its cool"},
+            {"choice_title": "No, Its not"}
+            ],
+        "answer_of_question": {"answer": 40},
+        "order": 1
     },
-    "choices": {
-        "c": "True",
-        "c": "False"
+    {
+        "question_title": "Question 2",
+        "choices_of_question": [
+            {"choice_title": "Its cool"},
+            {"choice_title": "No, Its not"}
+            ],
+        "answer_of_question": {"answer": 40},
+        "order": 2
     }
+    ],
+  "title": "The real Assignment 10",
+  "teacher": 3
 }
+
+
+
+###
+GET http://127.0.0.1:8000/assignments/teacher/2/ HTTP/1.1
+Content-Type: application/json
+Authorization: Token 558d643f57bf08e33f69b8af8936da1406c75df7
 
 ### register
 POST http://127.0.0.1:8000/myaccounts/register HTTP/1.1
