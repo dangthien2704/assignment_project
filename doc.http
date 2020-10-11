@@ -7,35 +7,41 @@ Content-Type: application/json
     "password": "test8888"
 }
 
+###
+GET http://127.0.0.1:8000/assignments/list/ HTTP/1.1
+Content-Type: application/json
+Authorization: Token f17458a9741fa9e1fb608aa4e43b0c963887a1d7
+
+
 
 ###
 POST http://127.0.0.1:8000/assignments/ HTTP/1.1
 Content-Type: application/json
-Authorization: Token 558d643f57bf08e33f69b8af8936da1406c75df7
+Authorization: Token f17458a9741fa9e1fb608aa4e43b0c963887a1d7
 
 {
   "questions_of_assignment": [
     {
-        "question_title": "Is it cool?",
+        "question_title": "Updated Is it hot?",
         "choices_of_question": [
-            {"choice_title": "Its cool"},
+            {"choice_title": "Its hot"},
             {"choice_title": "No, Its not"}
             ],
-        "answer_of_question": {"answer": 40},
+        "answer_of_question": {"answer": 2},
         "order": 1
     },
     {
-        "question_title": "Question 2",
+        "question_title": "Updated Is it cold?",
         "choices_of_question": [
-            {"choice_title": "Its cool"},
-            {"choice_title": "No, Its not"}
+            {"choice_title": "Yes it is "},
+            {"choice_title": "No it not"}
             ],
-        "answer_of_question": {"answer": 40},
+        "answer_of_question": {"answer": 4},
         "order": 2
     }
     ],
-  "title": "The real Assignment 10",
-  "teacher": 3
+  "title": "The real Assignment 5",
+  "teacher": 2
 }
 
 
@@ -43,7 +49,7 @@ Authorization: Token 558d643f57bf08e33f69b8af8936da1406c75df7
 ###
 GET http://127.0.0.1:8000/assignments/teacher/2/ HTTP/1.1
 Content-Type: application/json
-Authorization: Token 558d643f57bf08e33f69b8af8936da1406c75df7
+Authorization: Token f17458a9741fa9e1fb608aa4e43b0c963887a1d7
 
 ### register
 POST http://127.0.0.1:8000/myaccounts/register HTTP/1.1
@@ -64,3 +70,60 @@ Content-Type: application/json
     "is_teacher": true,
     "is_student": false
 }
+
+
+###
+POST http://127.0.0.1:8000/assignments/taker/4/ HTTP/1.1
+Content-Type: application/json
+Authorization: Token 3785f0eebb160b6181cd8842ce823d4fd352c8b6
+
+{
+  "questions_of_assignment": [
+    {
+      "id": 6,
+      "choices_of_question": [
+        {
+          "choice_title": "Its hot"
+        },
+        {
+          "choice_title": "No, Its not"
+        }
+      ],
+      "question_title": "Is it hot?",
+      "order": 1,
+      "assignment": 4
+    },
+    {
+      "id": 7,
+      "choices_of_question": [
+        {
+          "choice_title": "Yes it is"
+        },
+        {
+          "choice_title": "No it not"
+        }
+      ],
+      "answer_of_question": {
+        "answer": 2
+      },
+      "question_title": "Is it cold?",
+      "order": 2,
+      "assignment": 4
+    }
+  ],
+  "grade": 0,
+  "student": 3
+}
+
+
+
+###
+GET http://127.0.0.1:8000/assignments/taker/3 HTTP/1.1
+Content-Type: application/json
+Authorization: Token 3785f0eebb160b6181cd8842ce823d4fd352c8b6
+
+
+###
+POST http://127.0.0.1:8000/assignments/completed/4/ HTTP/1.1
+Content-Type: application/json
+Authorization: Token 3785f0eebb160b6181cd8842ce823d4fd352c8b6

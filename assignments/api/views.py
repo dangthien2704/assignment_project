@@ -1,5 +1,9 @@
-from assignments.api.serializers import AssignmentSerializer, AssignmentListSerializer
-from assignments.models import Assignment, MyUser
+from assignments.api.serializers import (
+    AssignmentSerializer,
+    AssignmentListSerializer,
+    GradedAssignmentListSerializer
+)
+from assignments.models import Assignment, MyUser, GradedAssignment
 
 from django.shortcuts import get_object_or_404
 
@@ -17,19 +21,11 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     queryset = Assignment.objects.all()
     permission_classes = (permissions.AllowAny, )
 
-    # def create(self, request):
-    #     serializer = AssignmentSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         assignment = serializer.save()
-    #         if assignment:
-    #             return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class AssignmentListView(generics.ListAPIView):
     serializer_class = AssignmentListSerializer
     queryset = Assignment.objects.all()
-    permission_classes = (permissions.IsAuthenticated, )
-
+    permission_classes = (permissions.AllowAny, )
+    
 class TeacherAssignmentListView(generics.ListAPIView):
     serializer_class = AssignmentListSerializer
     permission_classes = (permissions.AllowAny, )
@@ -38,3 +34,12 @@ class TeacherAssignmentListView(generics.ListAPIView):
     def get_queryset(self):
         user = get_object_or_404(MyUser, pk=self.kwargs['pk'])
         return Assignment.objects.filter(teacher=user)
+
+class GradedAssignmentListView(generics.ListAPIView):
+    serializer_class = GradedAssignmentListSerializer
+    queryset = GradedAssignment.objects.all()
+    permission_classes = (permissions.AllowAny, )
+
+    def get_queryset(self):
+        user = get_object_or_404(MyUser, pk=self.kwargs['pk'])
+        return GradedAssignment.objects.filter(student=user)
