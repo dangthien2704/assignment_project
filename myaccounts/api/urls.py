@@ -9,9 +9,7 @@ router.register(r'', UserViewSet, basename='user')
 # urlpatterns = router.urls
 
 urlpatterns = [
-    path('register', MyUserCreateView.as_view()),
-    path('profile/<int:pk>', ProfileStudentView.as_view()),
-    path('users', include(router.urls))
-    # path('users', MyUserListView.as_view()),
-    # path('users/<int:pk>', MyUserView.as_view())
+    path('register/', MyUserCreateView.as_view()),
+    path('profile/<int:pk>/', ProfileStudentView.as_view()),
+    path('users/', include(router.urls))
 ]

@@ -96,58 +96,9 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete = models.CASCADE,
-        # related_name='profile',
-        # primary_key=True
-        # null=True
+        related_name='profile'
     )
     student_id = models.CharField(max_length=15, blank=True)
     
     def __str__(self):
         return self.user.email
-
-
-# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-# def create_auth_token(sender, instance=None, created=False, **kwargs):
-#     if created:
-#         global token
-#         token = Token.objects.create(user=instance)
-
-        
-#     return token
-    
-
-# @receiver(post_save, sender=MyUser)
-# def create_or_update_user_profile(sender, instance, **kwargs):
-#     instance.profile.save()
-
-# @receiver(post_save, sender=MyUser)
-# def create_user_profile(sender, instance, created, **kwargs):
-#     if created:
-#         Profile.objects.create(user=instance)    #after user created it will create profile 
-#     # instance.profile.save()
-
-# @receiver(post_save, sender=MyUser)
-# def save_user_profile(sender, instance, **kwargs):
-#     instance.profile.save()
-
-# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-# def create_admin_profile(sender, instance, created, *args, **kwargs):
-#     """Create a matching profile whenever a user object is created."""
-#     if created: 
-#         profile, new = Profile.objects.get_or_create(user=instance)
-#     instance.profile.save()
-
-# def create_profile(sender,**kwargs ):
-#     if kwargs['created']:
-#         user_profile=Profile(user=kwargs['instance'])
-#         user_profile.save()
-
-# post_save.connect(create_profile, sender=MyUser)
-
-
-# post_save.connect(create_profile,sender=MyUser)
-    
-# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-# def create_auth_token(sender, instance=None, created=False, **kwargs):
-#     if created:
-#         Token.objects.create(user=instance)

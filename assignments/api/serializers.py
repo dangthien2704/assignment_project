@@ -6,22 +6,21 @@ from myaccounts.models import MyUser
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
-        fields = ('choice_title',)
+        fields = ['choice_title']
 
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ('answer',)
+        fields = ['answer']
 
 class QuestionSerializer(serializers.ModelSerializer):
 
     choices_of_question = ChoiceSerializer(many=True)
-    answer_of_question = AnswerSerializer(write_only=True) #only show for create or updeat
+    answer_of_question = AnswerSerializer() #only show for create or updeat
 
     class Meta:
         model = Question
         fields = '__all__'
-
 
 class AssignmentListSerializer(serializers.ModelSerializer): #for list all of assignment without questions
     class Meta:
@@ -34,7 +33,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Assignment
-        fields = '__all__'
+        fields = ['questions_of_assignment']
 
     def create(self, validated_data):
         # choices = question_data.pop('choices') # it's wrong cause question_data haven't define yet
@@ -55,41 +54,76 @@ class GradedAssignmentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = GradedAssignment
         fields = '__all__'
-        # fields = ('grade', 'completed', )
 
+class TakeQuestionSerializer(serializers.ModelSerializer):
+    # choices_of_question = ChoiceSerializer(many=True)
+    answer_of_question = AnswerSerializer() #only show for create or updeat
+    answer_of_student = serializers.CharField(required = False)
+    id = serializers.IntegerField()
+    class Meta:
+        model = Question
+        fields = ['id', 'question_title', 'answer_of_question', 'answer_of_student']
 
-# class CompletedAssignmentSerializer(serializers.ModelSerializer):
-#     graded_assignment = GradedAssignmentSerializer()
-#     questions_of_assignment = serializers.SerializerMethodField()
-#     # answer_of_student = serializers.ChoiceField(
-#     #     choices=questions_of_assignment['choices_of_question']
-#     #     )
-#     class Meta:
-#         model = Assignment
-#         fields = '__all__'
+class GradedAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GradedAssignment
+        fields = ('grade', 'completed', )
+        extra_kwargs = {
+            'grade': {'read_only': True},
+            'completed': {'read_only': True}
+            }
 
-#     def get_questions_of_assignment(self, obj):
-#         questions_of_assignment = QuestionSerializer(obj.questions_of_assignment.all(),
-#             many=True).data
-#         return questions_of_assignment
+class TakeAssignmentSerializer(serializers.ModelSerializer):
+    
+    questions_of_assignment = TakeQuestionSerializer(many=True)
+    assignment_id = serializers.IntegerField();
+    graded_assignment = GradedAssignmentSerializer()
 
-#     def create(self, validated_data):
-#         correct_answer_count = 0
-#         questions = assignment['questions_of_assignment']
-#         for question in questions:
-#             answer_of_student = serializers.ChoiceField(validated_data.pop('choices_of_question'))
-#             if answer_of_student == question['answer_of_question']:
-#                 correct_answer_count += 1
+    class Meta:
+        model = Assignment
+        fields = ['assignment_id','teacher', 'title',
+            'questions_of_assignment', 'graded_assignment']
+
+    def create(self, validated_data): #validated_data == request and use .pop to get list[] 
+        # data = request
+        # print ('VALIDATED DATA', self.validated_data)
+        valid_student = self.context.get('student')
+
+        """This is for getting answer of student list"""
+        q_asmt = self.validated_data['questions_of_assignment']
+        #or using validated_data.pop('') to get value
+        final_answer = []
+        for q in q_asmt:
+            a_student = q['answer_of_student']
+            final_answer.append(a_student)
+        # print ('FINAL ANSWER', final_answer)
+
+        """This is for gettings answer of questions from DB"""
+        selected_assignment = Assignment.objects.get(pk=self.validated_data['assignment_id'])
+        questions_of_assignment = selected_assignment.questions_of_assignment.all()
+        answer_of_assignment = []
+        for q in questions_of_assignment:
+            a = str(q.answer_of_question)
+            answer_of_assignment.append(a)
+        # print ("ANSWER", answer_of_assignment)
+
+        """Compare answer of student and questions then calculate score"""
+        result = 0
+        for a,b in zip(final_answer, answer_of_assignment):
+            if a == b:
+                result += 1
         
-#         no_of_questions = len(questions)
-#         grade = correct_answer_count / no_of_questions * 100
-#         completed = True
+        score = result / len(questions_of_assignment) * 10
 
-#         graded_assignment = GradedAssignment.objects.create(**validated_data)
-#         return graded_assignment
+        self.validated_data['graded_assignment']['grade'] = score  #self is the serializer in views.py
+        self.validated_data['graded_assignment']['completed'] = "True"
+        
+        valid_grade = self.validated_data['graded_assignment']
 
+        # created_grade = GradedAssignment.objects.create(
+        #     student=valid_student,
+        #     assignment=selected_assignment,
+        #     **valid_grade
+        # )
+        return valid_grade
 
-
-
-
-       

@@ -4,8 +4,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..models import MyUser
+from ..models import MyUser, Profile
 from .serializers import MyUserSerializer, ProfileSerializer
+from django.shortcuts import get_object_or_404
 
 
 class MyUserCreateView(generics.CreateAPIView):
@@ -25,7 +26,7 @@ class MyUserCreateView(generics.CreateAPIView):
         data["token"] = token.key
         headers = self.get_success_headers(serializer.data)
         return Response(data, status = status.HTTP_201_CREATED, headers=headers)
-    # return Response('Token Authentication: {}'.format(token.key), status = status.HTTP_201_CREATED, headers=headers)
+        
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -35,26 +36,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = MyUser.objects.all()
     permission_classes = (permissions.AllowAny, )
 
-class ProfileStudentView(views.APIView):
-    def get(self, request, *args, **kwargs):
-        # user_id = User.objects.get(pk = pk)
-        user = get_object_or_404(User, pk = kwargs['pk'])
-        profile_serializer = ProfileSerializer(user.student_id)
-        return profile_serializer.data
+class ProfileStudentView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    permission_classes = (permissions.IsAuthenticated, )
 
 
-
-# class MyUserListView(generics.ListAPIView):
-#     queryset = MyUser.objects.all()
-#     serializer_class = MyUserSerializer
-#     permission_classes = (permissions.IsAdminUser, )
-    
-# class MyUserView(generics.RetrieveAPIView):
-#     queryset = MyUser.objects.all()
-#     serializer_class = MyUserSerializer
-#     permission_classes = (permissions.IsAuthenticated, )
-    
-# class MyUserListView(generics.ListAPIView):
-#     queryset = MyUser.objects.all()
-#     serializer_class = MyUserSerializer
-#     permission_classes = (permissions.IsAdminUser, )    
