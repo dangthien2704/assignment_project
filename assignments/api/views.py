@@ -2,7 +2,8 @@ from assignments.api.serializers import (
     AssignmentSerializer,
     AssignmentListSerializer,
     GradedAssignmentListSerializer,
-    TakeAssignmentSerializer
+    TakeAssignmentSerializer,
+    PendingAssignmentSerializer
 )
 from assignments.models import Assignment, MyUser, GradedAssignment
 
@@ -15,9 +16,6 @@ from rest_framework.views import APIView
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
-    """
-    A viewset for viewing and editing user instances.
-    """
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
     permission_classes = (permissions.AllowAny, )
@@ -45,10 +43,7 @@ class GradedAssignmentListView(generics.ListAPIView):
         user = get_object_or_404(MyUser, pk=self.kwargs['pk'])
         return GradedAssignment.objects.filter(student=user)
 
-class TakeAssignmentViewSet(generics.CreateAPIView):
-    """
-    A viewset for viewing and editing user instances.
-    """
+class TakeAssignmentView(generics.CreateAPIView):
     serializer_class = TakeAssignmentSerializer
     permission_classes = (permissions.IsAuthenticated, )
     
@@ -63,11 +58,6 @@ class TakeAssignmentViewSet(generics.CreateAPIView):
             if check_result == True:
                 return Response(
                     {"Information": "This assignment is already complete. You can't take it!"},
-                    status=status.HTTP_412_PRECONDITION_FAILED
-			    )
-            else:
-                return Response(
-                    {"Information": "You haven't completed the assignment. Please continue!"},
                     status=status.HTTP_412_PRECONDITION_FAILED
 			    )
 
@@ -87,8 +77,10 @@ class TakeAssignmentViewSet(generics.CreateAPIView):
                 return Response(status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-
+class PendingAssignmentView(generics.ListAPIView):
+    serializer_class = PendingAssignmentSerializer
+    queryset = GradedAssignment.objects.filter(completed=False)
+    permission_classes = (permissions.IsAuthenticated, )
 
 
 """For thick views and thin serializer"""

@@ -12,7 +12,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class MyUserSerializer(serializers.ModelSerializer):
 
-    profile = ProfileSerializer()
+    profile = ProfileSerializer(read_only=True)
     password2 = serializers.CharField(
         label='Password confirmation',
         write_only = True,

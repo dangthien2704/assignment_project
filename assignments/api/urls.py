@@ -4,7 +4,8 @@ from .views import (
     AssignmentListView,
     TeacherAssignmentListView,
     GradedAssignmentListView,
-    TakeAssignmentViewSet
+    TakeAssignmentView,
+    PendingAssignmentView
 )
 from . import views
 from django.urls import path, include
@@ -18,6 +19,7 @@ urlpatterns = [
     path('list/', AssignmentListView.as_view()),
     path('teacher/<int:pk>/', TeacherAssignmentListView.as_view()),
     path('graded/<int:pk>/', GradedAssignmentListView.as_view()),
-    path('take/', TakeAssignmentViewSet.as_view()),
+    path('take/', TakeAssignmentView.as_view()),
+    path('pending/', PendingAssignmentView.as_view()),
     path('', include(router.urls))    
 ]
