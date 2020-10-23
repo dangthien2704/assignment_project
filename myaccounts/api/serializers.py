@@ -23,6 +23,7 @@ class MyUserSerializer(serializers.ModelSerializer):
         fields = ['email', 'first_name', 'last_name', 'department', 'phone', 'password', 'password2', 'profile', 'date_of_birth', 'is_teacher', 'is_student']
         extra_kwargs = {'password': {'write_only': True}}
 
+
     def create(self, validated_data):
         password = validated_data.pop('password')
         password2 = validated_data.pop('password2')

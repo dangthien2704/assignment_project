@@ -71,8 +71,6 @@ class MyUser(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'phone', 'date_of_birth', 'is_teacher', 'is_student']
 
-    ordering = ('created',)
-
     def __str__(self):
         return self.email
 

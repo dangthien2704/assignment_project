@@ -36,30 +36,34 @@ class Answer(models.Model):
         Choice, on_delete=models.CASCADE,
         related_name='answer_of_question', blank=True, null=True)  
 
-    
     def __str__(self):
         return self.answer.choice_title
 
-# class StudentAnswer(models.Model):
-#     student = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-#     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
-#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-#     choice_of_answer = models.ForeignKey(Choice, on_delete=models.CASCADE)
 
-#     def __str__(self):
-#         return self.choice_of_answer
+class CommonInfo(models.Model):
+    progress = models.CharField(max_length=4, default="0%")
+    completed = models.BooleanField(default=False)
+    grade = models.IntegerField(default=0)
+    
+    class Meta:
+        abstract = True
 
-class GradedAssignment(models.Model):
+class StudentAnswer(CommonInfo):
+    student = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='review_answer')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    answer_text = models.CharField(blank=True, max_length=100)
+
+    def __str__(self):
+        return "{} - {}".format(self.student.email, self.assignment)
+
+class GradedAssignment(CommonInfo):
     student = models.ForeignKey(MyUser,
         on_delete=models.CASCADE, related_name='done_assignment')
     assignment = models.ForeignKey(
         Assignment, on_delete=models.SET_NULL,
         related_name='graded_assignment', blank=True, null=True)
-    grade = models.IntegerField(default=0)
-    progress = models.CharField(max_length=4, default="0%")
-    completed = models.BooleanField(default=False)
-
+    
     def __str__(self):
-        return self.student.email
+        return "{} - {}".format(self.student.email, self.assignment)
         
         

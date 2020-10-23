@@ -62,9 +62,8 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     inlines = (ProfileInline,)
+    ordering = ('id', )
 
-    class Meta:
-        ordering = ('created', )
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return list()
@@ -90,7 +89,6 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     search_fields = ('email',)
-    ordering = ('email',)
     filter_horizontal = ()
 
 # Now register the new UserAdmin...

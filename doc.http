@@ -130,5 +130,5 @@ Authorization: Token 3785f0eebb160b6181cd8842ce823d4fd352c8b6
 
 
 ### register
-GET http://127.0.0.1:8000/myaccounts/profile/3/ HTTP/1.1
+PUT http://127.0.0.1:8000/assignments/take-pending/ HTTP/1.1
 Authorization: Token 3785f0eebb160b6181cd8842ce823d4fd352c8b6

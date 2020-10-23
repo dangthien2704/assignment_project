@@ -1,6 +1,8 @@
-from django.contrib import admin
-from assignments.models import Assignment, Question, Choice, GradedAssignment, Answer
 from django import forms
+from django.contrib import admin
+
+from .models import *
+
 # Register your models here.
 
 class AnswerAdminForm(forms.ModelForm):
@@ -27,10 +29,25 @@ class QuestionInline(admin.StackedInline):
 
 class AssignmentAdmin(admin.ModelAdmin):
     inlines = (QuestionInline,)
+    # ordering = ('id',)
+
+class GradedAssignmentAdmin(admin.ModelAdmin):
+    fields = ('student', 'assignment', 'grade', 'progress', 'completed', )
+
+# class StudentAnswerForm(forms.ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['question'].queryset = self.question.filter(assignment=self.instance.assignment)
+
+class StudentAnswerAdmin(admin.ModelAdmin):
+    fields = ('student', 'assignment',
+        'answer_text', 'progress', 'completed', )
+    # form = StudentAnswerForm
 
 
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Choice)
-admin.site.register(GradedAssignment)
+admin.site.register(GradedAssignment, GradedAssignmentAdmin)
+admin.site.register(StudentAnswer, StudentAnswerAdmin)
