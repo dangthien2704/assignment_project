@@ -21,6 +21,6 @@ urlpatterns = [
     path('graded/<int:pk>/', GradedAssignmentListView.as_view()),
     path('take/', TakeAssignmentView.as_view()),
     path('pending/<int:pk>/', PendingAssignmentView.as_view()),
-    path('take-pending/', TakePendingAssignmentView.as_view()),
+    path('take-pending/<int:pk>/', TakePendingAssignmentView.as_view()),
     path('', include(router.urls))    
 ]

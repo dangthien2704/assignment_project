@@ -121,10 +121,10 @@ class TakePendingAssignmentView(generics.UpdateAPIView):
     serializer_class = TakeAssignmentSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
-    def put(self, request):
+    def put(self, request, pk):
         data = request.data
         student = request.user 
-        instance = student.review_answer.get(assignment_id=data['id'])
+        instance = student.review_answer.get(assignment_id=self.kwargs['pk'])
         serializer = TakeAssignmentSerializer(instance, data=data)
         serializer.is_valid()    
         taken_assignment = serializer.save()     
