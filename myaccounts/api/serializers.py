@@ -3,6 +3,9 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 
+from django.contrib.auth import get_user_model
+
+MyUser = get_user_model()
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,37 +15,44 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class MyUserSerializer(serializers.ModelSerializer):
 
-    profile = ProfileSerializer(read_only=True)
+    profile = ProfileSerializer()
+    password = serializers.CharField(
+        label='Password',
+        write_only = True,
+        style={'input_type': 'password'}
+    )
     password2 = serializers.CharField(
         label='Password confirmation',
         write_only = True,
+        style={'input_type': 'password'}
     )
     
     class Meta:
         model = MyUser
-        fields = ['email', 'first_name', 'last_name', 'department', 'phone', 'password', 'password2', 'profile', 'date_of_birth', 'is_teacher', 'is_student']
+        fields = ['email', 'first_name', 'last_name', 'profile', 'password', 'password2', 'is_teacher', 'is_student']
         extra_kwargs = {'password': {'write_only': True}}
 
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
+        # data = self.validated_data
+        # print ('DATA', data)
+        password = self.validated_data['password']
         password2 = validated_data.pop('password2')
-
+        student_id = validated_data.pop('profile')
+        # print ('VALIDATEDATA', validated_data)
+        # print ('ID', student_id)
         if password and password2 and password != password2:
             raise serializers.ValidationError({'password': 'Password does not match!'})
-        profile_data = validated_data.pop('profile')
-        user = MyUser.objects.create(**validated_data)
-        """have to put set_password and save otherwise can not login in rest-auth because it won't create password even though user created"""
-        user.set_password(password)   
-        user.save()
-        profile_data['user'] = user
-        profile_instance = Profile.objects.create(**profile_data)
-        # or profile_instance = Profile.objects.create(user=user,**profile_data)
+        user = MyUser.objects.create_user(**validated_data)
+        profile = Profile.objects.create_profile(user=user, **student_id)
+        print ('PROFILE', profile)
         return user
-
 
 class LoginSerializer(RestAuthLoginSerializer):
     username = None
+    
+
+
 
 
 

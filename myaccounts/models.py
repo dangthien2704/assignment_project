@@ -11,37 +11,35 @@ from rest_framework.authtoken.models import Token
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, phone, date_of_birth, is_teacher, is_student, password=None, **other_fields):
+    def create_user(self, email, first_name, last_name, is_teacher, is_student, password=None, **other_fields):
         """
         Creates and saves a User with the given email, date of
         birth and password.
         """
         if not email:
             raise ValueError('Users must have an email address')
-        
+        if not password:
+            raise ValueError("Users must have a password")
+
         user = self.model(
             email=self.normalize_email(email),
             first_name = first_name,
             last_name = last_name,
-            phone = phone,
-            date_of_birth=date_of_birth,
             is_teacher = is_teacher,
-            is_student = is_student,
+            is_student = is_student
         )
         user.set_password(password)
         user.save(using=self._db)
-        
+        print ('MANAGER', user)
         return user
 
-    def create_superuser(self, email, first_name, last_name, phone, date_of_birth, is_teacher, is_student, password=None, **other_fields):
+    def create_superuser(self, email, first_name, last_name, is_teacher, is_student, password=None, **other_fields):
 
         user = self.create_user(
             email,
             password=password,
             first_name = first_name,
             last_name = last_name,
-            phone = phone,
-            date_of_birth=date_of_birth,
             is_teacher = is_teacher,
             is_student = is_student,
         )
@@ -49,6 +47,13 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+class ProfileManger(models.Manager):
+    def create_profile(self, user, student_id):
+        profile = self.model(user=user, student_id=student_id)
+        profile.save()
+        print ('PRO MNR', profile)
+
+        return profile
 
 class MyUser(AbstractBaseUser):
     email = models.EmailField(
@@ -58,9 +63,9 @@ class MyUser(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    department = models.CharField(max_length=50)
-    phone = models.CharField(max_length=50, unique = True)
-    date_of_birth = models.DateField()
+    department = models.CharField(max_length=50, blank=True, null=True)
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
     is_teacher = models.BooleanField()
     is_student = models.BooleanField()
     is_active = models.BooleanField(default=True)
@@ -69,7 +74,7 @@ class MyUser(AbstractBaseUser):
     objects = MyUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone', 'date_of_birth', 'is_teacher', 'is_student']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'is_teacher', 'is_student']
 
     def __str__(self):
         return self.email
@@ -98,5 +103,7 @@ class Profile(models.Model):
     )
     student_id = models.CharField(max_length=15, blank=True)
     
+    objects = ProfileManger()
+
     def __str__(self):
         return self.user.email

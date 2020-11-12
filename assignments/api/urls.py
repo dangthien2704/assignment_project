@@ -6,8 +6,8 @@ from .views import (
     TeacherAssignmentListView,
     GradedAssignmentListView,
     TakeAssignmentView,
-    PendingAssignmentView,
-    TakePendingAssignmentView
+    # PendingAssignmentView
+    # TestingAssignmentCreateView
 )
 
 
@@ -20,7 +20,7 @@ urlpatterns = [
     path('teacher/<int:pk>/', TeacherAssignmentListView.as_view()),
     path('graded/<int:pk>/', GradedAssignmentListView.as_view()),
     path('take/', TakeAssignmentView.as_view()),
-    path('pending/<int:pk>/', PendingAssignmentView.as_view()),
-    path('take-pending/<int:pk>/', TakePendingAssignmentView.as_view()),
+    # path('pending/<int:pk>/', PendingAssignmentView.as_view()),
+    path('take-pending/<int:pk>/', TakeAssignmentView.as_view()),
     path('', include(router.urls))    
 ]

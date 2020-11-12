@@ -1,6 +1,6 @@
 from django.db import models
 from myaccounts.models import MyUser
-
+import assignments.managers
 
 class Assignment(models.Model):
     title = models.CharField(max_length=50)
@@ -9,23 +9,31 @@ class Assignment(models.Model):
     def __str__(self):
         return self.title
 
+
 class Question(models.Model):
     id = models.IntegerField(primary_key=True)
     question_title = models.CharField(max_length=200)
     assignment = models.ForeignKey(
-        Assignment, on_delete=models.CASCADE,
-        related_name='questions_of_assignment', blank=True, null=True)
+        Assignment,
+        on_delete=models.CASCADE,
+        related_name='questions_of_assignment',blank=True, null=True
+    )
     
     
     def __str__(self):
         return self.question_title
 
+
 class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices_of_question')
+    question = models.ForeignKey(Question,
+        on_delete=models.CASCADE,
+        related_name='choices_of_question'
+    )
     choice_title = models.CharField(max_length=50)
 
     def __str__(self):
         return self.choice_title
+
 
 class Answer(models.Model):
     question = models.OneToOneField(
@@ -48,13 +56,19 @@ class CommonInfo(models.Model):
     class Meta:
         abstract = True
 
+
 class StudentAnswer(CommonInfo):
-    student = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='review_answer')
+    student = models.ForeignKey(
+        MyUser,
+        on_delete=models.CASCADE,
+        related_name='review_answer'
+    )
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     answer_text = models.CharField(blank=True, max_length=100)
 
     def __str__(self):
         return "{} - {}".format(self.student.email, self.assignment)
+
 
 class GradedAssignment(CommonInfo):
     student = models.ForeignKey(MyUser,
@@ -63,7 +77,12 @@ class GradedAssignment(CommonInfo):
         Assignment, on_delete=models.SET_NULL,
         related_name='graded_assignment', blank=True, null=True)
     
+    objects = models.Manager()
+    graded_objects = assignments.managers.TakeAssignmentManager()
+
+
     def __str__(self):
         return "{} - {}".format(self.student.email, self.assignment)
         
-        
+    def compute_grade(self):
+        pass

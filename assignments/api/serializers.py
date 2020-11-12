@@ -82,152 +82,46 @@ class GradedAssignmentSerializer(serializers.ModelSerializer):
         #     'progress': {'read_only': True}
         #     }
 
+
 class TakeAssignmentSerializer(serializers.ModelSerializer):
     
     questions_of_assignment = TakeQuestionSerializer(many=True)
-    graded_assignment = GradedAssignmentSerializer()
+    # graded_assignment = GradedAssignmentSerializer()
     # assignment_id = serializers.IntegerField();
 
     class Meta:
         model = Assignment
-        fields = ['teacher', 'title',
-            'questions_of_assignment', 'graded_assignment']
+        fields = ['teacher', 'title', 'questions_of_assignment']
 
     def create(self, validated_data): #validated_data == request and use .pop to get list[] 
         # data = request
-        # print ('VALIDATED DATA', self.validated_data)
+        # print ('VALIDATED DATA', validated_data)
         valid_student = self.context.get('student')
-
-
-        """Getting answer of student list"""
-        q_asmt = self.validated_data['questions_of_assignment']
-        #or using validated_data.pop('') to get value
-        final_answer = []
-        for q in q_asmt:
-            a_student = q['answer_of_student']['answer_text']
-            final_answer.append(a_student)
-        # print ('FINAL ANSWER', final_answer)
+        selected_assignment = Assignment.objects.get(title=validated_data['title'])
         
-        
-        """Getting answer of questions from DB"""
-        selected_assignment = Assignment.objects.get(title=self.validated_data['title'])
-        questions_of_assignment = selected_assignment.questions_of_assignment.all()
-        answer_of_assignment = []
-        for q in questions_of_assignment:
-            a = str(q.answer_of_question)
-            answer_of_assignment.append(a)
-        # print ("ANSWER", answer_of_assignment)
-
-
-        """Comparing answer of student&questions then calculate score"""
-        result = 0
-        for a,b in zip(final_answer, answer_of_assignment):
-            if a == b:
-                result += 1
-        
-        score = result / len(questions_of_assignment) * 10
-        print ('SCORE', score)
-        self.validated_data['graded_assignment']['grade'] = score  #self is the serializer in views.py
-        
-
-        """Calculating progress"""
-        completed_question = 0
-        for a in final_answer:
-            if a != '':
-                completed_question += 1
-        progress = completed_question/len(questions_of_assignment)*100
-        self.validated_data['graded_assignment']['progress'] = "{}%".format(progress)
-
-
-        """Checking if the assignment has been completed"""    
-        if progress < 100:
-            self.validated_data['graded_assignment']['completed'] = "False"
-        else:
-            self.validated_data['graded_assignment']['completed'] = "True"  
-
-
-        """Creating instance in DB of GradedAssignment"""
-        valid_grade = self.validated_data['graded_assignment']
-        created_grade = GradedAssignment.objects.create(
+        """Counting grade"""
+        counting = GradedAssignment.graded_objects.compute_grade(
             student=valid_student,
             assignment=selected_assignment,
-            **valid_grade
+            validated_data = validated_data
         )
 
-        """Creating instance in DB of StudentAnswer"""
-        created_studentanswer = StudentAnswer.objects.create(
+
+        """Creating or Updating GradedAssignment and StudentAnswer"""
+        taken_assignment = GradedAssignment.graded_objects.create(
             student=valid_student,
             assignment=selected_assignment,
-            answer_text=final_answer,
-            **valid_grade
+            validated_data = validated_data
         )
 
-        return valid_grade
+        # print ('Final', taken_assignment)
+        return taken_assignment
 
 
-    def update(self, instance, validated_data):
-        data = self.validated_data
-        student = instance.student
-        assignment_id = instance.assignment_id
-        graded_instance = student.done_assignment.get(assignment_id=assignment_id)
-        print ('GRADED', graded_instance.completed)
 
-        """Getting and UPDATING answer of student"""
-        final_answer = []
-        for q in data['questions_of_assignment']:
-            a_text = q['answer_of_student']['answer_text']
-            final_answer.append(a_text)
-
-        instance.answer_text = final_answer
-
-
-        """Getting answer of questions from DB"""
-        selected_assignment = Assignment.objects.get(title=self.validated_data['title'])
-        questions_of_assignment = selected_assignment.questions_of_assignment.all()
-        answer_of_assignment = []
-        for q in questions_of_assignment:
-            a = str(q.answer_of_question)
-            answer_of_assignment.append(a)
-
-
-        """Comparing result and UPDATING score"""
-        result = 0
-        for a,b in zip(final_answer, answer_of_assignment):
-            if a == b:
-                result += 1
-        score = result / len(questions_of_assignment) * 10
-        print ('SCORE', score)
-        
-        instance.grade = score
-        graded_instance.grade = score
-
-
-        """Calculating and UPDATING progress"""
-        completed_question = 0
-        for a in final_answer:
-            if a != '':
-                completed_question += 1
-        progress = completed_question/len(questions_of_assignment)*100
-        
-        instance.progress = "{}%".format(progress)
-        graded_instance.progress = "{}%".format(progress)
-
-
-        """Checking and UPDATING completed"""    
-        if progress < 100:
-            instance.completed = "False"
-            graded_instance.completed = "False"
-        else:
-            instance.completed = "True"  
-            graded_instance.completed = "True"
-
-        instance.save()
-        graded_instance.save()
-        return instance
-
-class PendingAssignmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GradedAssignment
-        fields = ['assignment', 'grade', 'progress']
+# class PendingAssignmentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = GradedAssignment
+#         fields = ['assignment', 'grade', 'progress']
 
     
