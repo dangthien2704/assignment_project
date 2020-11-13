@@ -1,12 +1,11 @@
-from .views import MyUserCreateView, ProfileStudentView
 from django.urls import path, include
-# from myaccounts.api.views import MyUserListView, MyUserView
-from rest_framework.routers import DefaultRouter    
-from myaccounts.api.views import UserViewSet
+from rest_framework.routers import DefaultRouter
+
+from .views import *
+
 
 router = DefaultRouter()
 router.register(r'', UserViewSet, basename='user')
-# urlpatterns = router.urls
 
 urlpatterns = [
     path('register/', MyUserCreateView.as_view()),

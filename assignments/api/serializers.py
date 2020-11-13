@@ -114,14 +114,13 @@ class TakeAssignmentSerializer(serializers.ModelSerializer):
             validated_data = validated_data
         )
 
-        # print ('Final', taken_assignment)
         return taken_assignment
 
 
 
-# class PendingAssignmentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = GradedAssignment
-#         fields = ['assignment', 'grade', 'progress']
+class PendingAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GradedAssignment
+        fields = ['assignment', 'grade', 'progress']
 
     
