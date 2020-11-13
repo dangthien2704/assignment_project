@@ -97,12 +97,12 @@ class TakeAssignmentSerializer(serializers.ModelSerializer):
         # data = request
         # print ('VALIDATED DATA', validated_data)
         valid_student = self.context.get('student')
-        selected_assignment = Assignment.objects.get(title=validated_data['title'])
+        taken_assignment = Assignment.objects.get(title=validated_data['title'])
         
         """Counting grade"""
         counting = GradedAssignment.graded_objects.compute_grade(
             student=valid_student,
-            assignment=selected_assignment,
+            assignment=taken_assignment,
             validated_data = validated_data
         )
 
@@ -110,7 +110,7 @@ class TakeAssignmentSerializer(serializers.ModelSerializer):
         """Creating or Updating GradedAssignment and StudentAnswer"""
         taken_assignment = GradedAssignment.graded_objects.create(
             student=valid_student,
-            assignment=selected_assignment,
+            assignment=taken_assignment,
             validated_data = validated_data
         )
 

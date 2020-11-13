@@ -9,14 +9,14 @@ class TakeAssignmentManager(models.Manager):
         answer_of_assignment = [str(q.answer_of_question) for q in questions_of_assignment]
         # print ('MANAGER', assignment)
 
-        """Getting the answers of student"""
+        """Getting the submitted answers from student"""
         questions_of_assignment = validated_data['questions_of_assignment']
-        final_answer = [q['answer_of_student']['answer_text'] for q in questions_of_assignment]
-        # print ('FINAL ANSWER', final_answer)
+        submitted_answer = [q['answer_of_student']['answer_text'] for q in questions_of_assignment]
+        # print ('SUBMITTED ANSWER', submitted_answer)
 
         """Comparing answer of student&questions then calculate score"""
         result = 0
-        for a, b in zip(final_answer, answer_of_assignment):
+        for a, b in zip(submitted_answer, answer_of_assignment):
             if a == b:
                 result += 1
         score = result / len(questions_of_assignment) * 10
@@ -24,12 +24,13 @@ class TakeAssignmentManager(models.Manager):
 
         """Calculating progress"""
         completed_question = 0
-        for a in final_answer:
+        for a in submitted_answer:
             if a != '':
                 completed_question += 1
         progress = completed_question/len(questions_of_assignment)*100
         formatted_progress = "{}%".format(
-            completed_question/len(questions_of_assignment)*100)
+            completed_question/len(questions_of_assignment)*100
+        )
         # print ('PROGRESS', formatted_progress)
 
         """Checking if the assignment has been completed"""
@@ -40,7 +41,7 @@ class TakeAssignmentManager(models.Manager):
         # print ('completed', completed)
 
         return {
-            'final_answer': final_answer,
+            'submitted_answer': submitted_answer,
             'progress': formatted_progress,
             'completed': completed,
             'grade': score
@@ -48,9 +49,8 @@ class TakeAssignmentManager(models.Manager):
 
     def create(self, student, assignment, validated_data):
         record = self.compute_grade(student, assignment, validated_data)
-        final_answer = record.pop('final_answer')
-        print('RECORD', record)
-        # record_update = record.pop('assignment')
+        submitted_answer = record.pop('submitted_answer')
+        # print('RECORD', record)
 
         """Creating instance in DB of GradedAssignment"""
         created_grade, created = assignments.models.GradedAssignment.objects.update_or_create(
@@ -66,7 +66,7 @@ class TakeAssignmentManager(models.Manager):
             student=student,
             assignment=assignment,
             defaults={
-                'answer_text': final_answer,
+                'answer_text': submitted_answer,
                 **record
             },
         )

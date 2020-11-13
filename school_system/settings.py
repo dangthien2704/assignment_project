@@ -32,8 +32,7 @@ INSTALLED_APPS = [
     'rest_auth',
 
     'myaccounts',
-    'assignments',
-    'articles'
+    'assignments'
 ]
 
 REST_FRAMEWORK = {
